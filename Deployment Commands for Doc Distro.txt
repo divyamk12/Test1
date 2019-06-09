@@ -1,0 +1,87 @@
+========================================================================================================================
+
+Current Mount Path per Tenant:
+//10.200.10.48/CLEAR/BC_CLEAR/WATCH/CUSTOM/CBS                     4.0T  3.2T  913G  78% /mnt/uploadzip/CBS
+//10.200.10.48/CLEAR/BC_CLEAR/WATCH/CUSTOM/LGTV                    4.0T  3.2T  913G  78% /mnt/uploadzip/LGTV
+//10.200.10.48/CLEAR/BC_CLEAR/WATCH/CUSTOM/WBTV                    4.0T  3.2T  913G  78% /mnt/uploadzip/WBTV
+//10.200.10.48/CLEAR/BC_CLEAR/WATCH/CUSTOM/MediaUniverse           4.0T  3.2T  913G  78% /mnt/uploadzip/MediaUniverse
+//10.200.10.48/CLEAR/BC_CLEAR/WATCH/CUSTOM/QASTUDIO                4.0T  3.2T  913G  78% /mnt/uploadzip/QASTUDIO
+//10.200.10.48/CLEAR/BC_CLEAR/WATCH/CUSTOM/PFTSTUDIO               4.0T  3.2T  913G  78% /mnt/uploadzip/PFTSTUDIO
+//10.200.10.48/CLEAR/BC_CLEAR/WATCH/CUSTOM/FOXPC                   4.0T  3.2T  913G  78% /mnt/uploadzip/FOXPC
+//10.200.10.48/CLEAR/BC_CLEAR/WATCH/CUSTOM/AzureDemo               4.0T  3.2T  913G  78% /mnt/uploadzip/AzureDemo
+//10.200.10.48/CLEAR/BC_CLEAR/WATCH/CUSTOM/Paramount               4.0T  3.2T  913G  78% /mnt/uploadzip/Paramount
+//10.200.10.48/CLEAR/BC_CLEAR/WATCH/CUSTOM/LionsgateEntertainment  4.0T  3.2T  913G  78% /mnt/uploadzip/LionsgateEntertainment
+//10.200.10.48/clear/BC_CLEAR                                      4.0T  3.2T  913G  78% /mnt2
+
+--------------------------------------------
+NOTE: Run all the command as sudo
+--------------------------------------------
+
+If it is not mounted, run this command to mount the directory:
+---------------------------------------------------------------
+mount -a /mnt2
+(Make sure /etc/fstab entry is present)
+
+Steps to create new softlink:
+------------------------------------
+cd /
+mkdir -pv uploadzip
+cd uploadzip
+ln -s /mnt2/WATCH/CUSTOM/CBS CBS
+ln -s /mnt2/WATCH/CUSTOM/LGTV LGTV
+
+Verify the Softlink:
+-----------------------
+ls -latr /uploadzip
+
+Change the permission to root:
+-------------------------------
+chown -R root:root /uploadzip/CBS
+
+-------------------------------------------------------------------------------------------------
+Change the distribution config
+Path: /opt/clear/pythonservices/bulk-watermarking/watermarkService
+File : distributionconfig
+
+Property to be changed:
+
+Old Path:
+"uploadmount_path": "/mnt/uploadzip"
+
+New Path
+"uploadmount_path": "/uploadzip"
+
+
+/etc/fstab Backup:
+
+//10.200.10.48/clear/BC_CLEAR /mnt2 cifs credentials=/root/.smbcredentials,iocharset=utf8,dir_mode=0777,file_mode=0777,nounix,vers=2.0 0 0
+
+If /root/.smbcredentials does not exist, create a new file
+
+sudo vi /root/.smbcredentials
+
+Add below lines:
+
+username=MAAdmin
+password=B04Admin
+domain=PFTCLOUD
+
+//10.200.5.9/clear/BC_CLEAR /mnt2
+
+\\10.200.5.9\Clear\BC_CLEAR\WATCH\CUSTOM\QASTUDIO
+
+sudo ln -siv \\10.200.5.9\Clear\BC_CLEAR\WATCH\CUSTOM\QASTUDIO QASTUDIO
+
+root@wus2-pctmmgr-v3:/mnt2# cd /home/pftadmin/
+root@wus2-pctmmgr-v3:/home/pftadmin# sudo ln -siv /mnt2/WATCH/CUSTOM/QASTUDIO QASTUDIO
+
+ls -lh - to view mount path
+
+ 309  ps -eaf|grep jboss
+MAnager- 
+sudo /home/pftadmin/jboss-eap-6.2/bin/standalone.sh -b 0.0.0.0 -c standalone-full.xml -P="/home/pftadmin/jboss-eap-6.2/standalone/configuration/clear/configless.properties" -Djboss.server.data.dir="/mnt/AzureMCJbossData" &
+Agent -
+sudo /home/pftadmin/jboss-eap-6.2/bin/standalone.sh -b 0.0.0.0 -c standalone-full.xml -P="/home/pftadmin/jboss-eap-6.2/standalone/configuration/clear/configless.properties" &
+
+
+
